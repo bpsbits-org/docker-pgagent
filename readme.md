@@ -17,6 +17,19 @@ The **PostgreSQL Container Extender** is a lightweight tool designed to enhance 
 
 **pgAgent** is an open-source job scheduling agent designed **specifically for PostgreSQL databases**, enabling the automation of tasks such as database maintenance, backups, and custom scripts. It operates as a background daemon, storing job definitions (including steps and schedules) in a dedicated PostgreSQL schema, and supports executing SQL commands, stored procedures, or external shell scripts at specified intervals or times. Integrated with pgAdmin for easy management, pgAgent ensures reliable, ACID-compliant execution within the Postgres environment.
 
+## Your Own Custom Postgres Extensions and Tools
+
+PostgreSQL extensions are modular add-ons that enhance database functionality, such as adding new data types, functions, or indexing methods. With **docker-pgagent**, you can automatically install your own custom extensions and tools as `.deb` packages when the container runs for the first time.
+
+**.deb packages** are Debian-based software packages used to distribute and install software on Debian-compatible systems, including the PostgreSQL container environment. These packages bundle binaries, configuration files, and dependencies, ensuring seamless installation.
+
+To include your custom extensions or tools, place the `.deb` packages in a designated directory . There are multiple ways to achieve this:
+
+1. **Using a Temporary Volume**: Create a temporary volume, import your `.deb` packages into it, and link it to the builder container during the `docker-pgagent` volume creation (see section **Install `docker-pgagent`**).
+2. **Direct Copy**: Copy the `.deb` packages directly into the `docker-pgagent` volume before its first usage (`/var/lib/docker-pgagent/apt/pkg`).
+
+Follow the instructions in **Install `docker-pgagent`** to ensure the packages are automatically installed during the container's initial startup, simplifying the process of extending your PostgreSQL environment.
+
 ## Usage
 
 There are two primary use cases for `docker-pgagent`: installing it on a new PostgreSQL instance or extending an existing PostgreSQL installation. We recommend testing the deployment in a non-production environment before applying it to a production environment.
@@ -43,7 +56,7 @@ podman volume create vol_docker_pgagent # Volume containing docker-pgagent
 podman volume create vol_postgres_data # PostgreSQL data volume
 ```
 
-#### 2. Install `pg_ext`
+#### 2. Install `docker-pgagent`
 
 ```shell
 PATH_DIR_PACKAGES=/home/dev/my-dep-packages # Path to the additional extensions (.deb)
@@ -55,7 +68,7 @@ podman run --rm \
     --platform linux/amd64 \
     docker.io/library/debian:trixie-slim cp -rv /source/. /root/extra_packages/
 
-# Install docker-pgaent into vol_docker_pgagent
+# Install docker-pgagent into vol_docker_pgagent
 podman run --rm \
     -v vol_tmp_ext:/root/extra_packages:z \
     -v vol_docker_pgagent:/var/lib/docker-pgagent:z \
