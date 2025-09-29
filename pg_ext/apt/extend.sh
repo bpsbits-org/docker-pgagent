@@ -21,6 +21,8 @@ pg_update_system(){
         apt-get update && apt-get install -y $APT_PKG
         mkdir -p "$(dirname "${PG_UPD_STATUS}")" && echo "done" > "${PG_UPD_STATUS}"
         echo "$(date -u '+%Y-%m-%d %H:%M:%S.%3N %Z') LOG: System update finished"
+    else
+        echo "$(date -u '+%Y-%m-%d %H:%M:%S.%3N %Z') LOG: System update is not needed"
     fi
 }
 
